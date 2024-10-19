@@ -85,7 +85,7 @@ function! intelhex#new(opts = {}) abort
     endfunction
 
     function l:code.vsize() abort
-        return max([self.vaddr[1] - self.vaddr[0] - 1, 0])
+        return max([self.vaddr[1] - self.vaddr[0], 0])
     endfunction
 
     function l:code.blob(filler = 255) abort
