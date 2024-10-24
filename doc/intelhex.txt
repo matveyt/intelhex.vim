@@ -1,0 +1,84 @@
+*intelhex.txt*	Intel HEX format support
+
+==============================================================================
+*INTRODUCTION*						      *intelhex-intro*
+
+This is alternative |ftplugin| for Intel HEX files. Besides Vim |syntax|, it
+also provides file checking and conversion implemented in pure VimScript. No
+external utilites needed.
+
+==============================================================================
+MAPPINGS						    *intelhex-mappings*
+
+g?              |:Validate| current buffer
+gn              |:Normalize| current buffer
+g8              |:Normalize| and force 8-bit format
+gj              Go to next record other than data
+gk              Go to previous record other than data
+
+==============================================================================
+COMMANDS						   *intelhex-commands*
+
+:Binary {file}							     *:Binary*
+
+  Converts and saves HEX to new binary {file}.
+
+:Normalize[!]							  *:Normalize*
+
+  Sorts and merges data chunks in HEX file. If ! is present then also strips
+  all segments and entry point info (8-bit format).
+
+:Validate						           *:Validate*
+
+  In memory compiles HEX file and shows info.
+
+==============================================================================
+*FUNCTIONS*						  *intelhex-functions*
+
+intelhex#new([{data_size} [, {skip_max}]])		      *intelhex#new()*
+
+  Creates new empty object. {data_size} is length of data record to output.
+  Default is 16. {skip_max} is maximum number of lines to skip before aborting
+  compile. Default is 50.
+
+intelhex.compile([{buf} [, {base16}]])			  *intelhex.compile()*
+
+  Compiles {buf} into |self| Can be invoked multiple times. {buf} is a buffer
+  name or |List| of lines. {base16} is a number to rebase 16-bit offsets in
+  HEX file. Default is 0.
+
+intelhex.dump([{force8} [, {replace}]])			     *intelhex.dump()*
+
+  Dumps compiled |self| into current buffer in HEX format. If {force8} is
+  present and |TRUE| then strips segments and entry point info (8-bit format).
+  If {replace} is present and |TRUE| then replaces all lines in current
+  buffer. Example code >
+
+  :let code = intelhex#new()
+  :call code.compile('foo.ihx')
+  :call code.show()
+  :call code.compile('bar.ihx')
+  :call code.show()
+  :call code.dump(0, 1)
+>
+intelhex.blob([{filler}])				     *intelhex.blob()*
+
+  Returns binary data |Blob|. {filler} is a number used to fill the gaps in
+  output. Default is 0xFF. Example code >
+
+  :call intelhex#new().compile().blob()->writefile('data.bin')
+>
+intelhex.show()						     *intelhex.show()*
+
+  Pretty prints compile statistics.
+
+intelhex#checksum([{value} ...])			 *intelhex#checksum()*
+
+  Calculates Intel HEX checksum of given values. Accepts 16-bit number, |Blob|
+  or |List| of bytes. Example code >
+
+  :echo intelhex#checksum(8, 0x1234, 0zdeadbeefdeadbeef)
+  :"66
+>
+==============================================================================
+ vim:tw=78:ts=8:ft=help:norl:

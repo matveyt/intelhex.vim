@@ -1,6 +1,6 @@
 " Vim filetype plugin
 " Language:     Intel HEX
-" Last Change:  2024 Oct 18
+" Last Change:  2024 Oct 24
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/intelhex.vim
 
@@ -16,16 +16,18 @@ let b:undo_ftplugin = 'setl ai< si< fo< com< cms< tw<'
 setlocal noautoindent nosmartindent textwidth=43
 setlocal comments= commentstring= formatoptions=
 
-nnoremap <buffer>g8 <cmd>Normalize<CR>
 nnoremap <buffer>g? <cmd>Validate<CR>
+nnoremap <buffer>gn <cmd>Normalize<CR>
+nnoremap <buffer>g8 <cmd>Normalize!<CR>
+nnoremap <buffer>gj <cmd>call search('^:\x\{6}0[1-5]', 'ewz')<CR>
+nnoremap <buffer>gk <cmd>call search('^:\x\{6}0[1-5]', 'bewz')<CR>
 
-command! -buffer -bar -nargs=1 Binary
-    \ call intelhex#new()->intelhex#compile().blob()->writefile(<q-args>)
+command! -buffer -bar -complete=file -nargs=+ Binary
+    \ call intelhex#new().compile().blob()->writefile(<f-args>)
 command! -buffer -bar -bang Normalize
-    \ call intelhex#new()->intelhex#compile()
-    \   ->intelhex#dump(#{ force8: <bang>0, replace: -1 })
+    \ call intelhex#new().compile().dump(<bang>0, v:true)
 command! -buffer -bar Validate
-    \ call intelhex#new(#{ check_only: 1 })->intelhex#compile()->intelhex#show_info()
+    \ call intelhex#new().compile().show()
 
 let &cpo = s:cpo_save
 unlet s:cpo_save
