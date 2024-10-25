@@ -19,9 +19,13 @@ gk              Go to previous record other than data
 ==============================================================================
 COMMANDS						   *intelhex-commands*
 
-:Binary {file}							     *:Binary*
+:Bin2Hex {file}							    *:Bin2Hex*
 
   Converts and saves HEX to new binary {file}.
+
+:Hex2Bin {file}							    *:Hex2Bin*
+
+  Loads binary {file} as HEX.
 
 :Normalize[!]							  *:Normalize*
 

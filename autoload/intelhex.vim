@@ -1,6 +1,6 @@
 " Vim filetype plugin
 " Language:     Intel HEX
-" Last Change:  2024 Oct 24
+" Last Change:  2024 Oct 25
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/intelhex.vim
 
@@ -170,6 +170,7 @@ function s:ihex_new_chunk(chunk) abort dict
     " data record longer than data_size?
     let self.adjust += (l:chunk_size > self.data_size)
     let self.last_size = l:chunk_size
+    return self
 endfunction
 
 function s:ihex_new_error(lineno, msg, skipline = v:true) abort dict
