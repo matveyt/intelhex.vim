@@ -1,6 +1,6 @@
 " Vim filetype plugin
 " Language:     Intel HEX
-" Last Change:  2024 Oct 25
+" Last Change:  2024 Oct 26
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/intelhex.vim
 
@@ -45,7 +45,7 @@ let s:error_rectyp = [
         \ ['self.bits == 32', '16-bit record not allowed here'],
         \ ['self.has_entry()', 'duplicate entry point'],
         \ ['reclen != 4 || offset != 0', 'bad 16-bit entry point'],
-        \ ['(high << 4) + low >= (1 << 20)', '16-bit entry point over 1 MB'],
+        \ ['(hi << 4) + lo >= (1 << 20)', '16-bit entry point over 1 MB'],
     \ ],
     "\ rectyp == 4
     \ [
@@ -238,26 +238,26 @@ function s:ihex_line(...) abort dict
             let [self.eof_lineno_1, self.eof_lineno_2] = [l:lineno, self.last_lineno]
         endif
     elseif l:rectyp == 2
-        " extended segment address (assume 16-bit)
-        let l:hi = (l:chunk[-3] << 12) + (l:chunk[-2] << 4)
+        " extended segment address
+        let l:hi = (l:chunk[-3] << 8) + l:chunk[-2]
         if s:test(s:error_rectyp[l:rectyp]) < 0
-            let self.bits = 16
-            let self.last_segment = l:hi
+            let self.bits = l:hi ? 16 : self.bits
+            let self.last_segment = l:hi << 4
         endif
     elseif l:rectyp == 3
-        " start segment address (assume 16-bit)
+        " start segment address
         let l:hi = (l:chunk[-5] << 8) + l:chunk[-4]
         let l:lo = (l:chunk[-3] << 8) + l:chunk[-2]
         if s:test(s:error_rectyp[l:rectyp]) < 0
-            let self.bits = 16
+            let self.bits = l:hi ? 16 : self.bits
             let [self.entry_lo, self.entry_hi] = [l:base16 + l:lo, l:hi << 4]
         endif
     elseif l:rectyp == 4
         " extended linear address 32-bit
-        let l:hi = (l:chunk[-3] << 24) + (l:chunk[-2] << 16)
+        let l:hi = (l:chunk[-3] << 8) + l:chunk[-2]
         if s:test(s:error_rectyp[l:rectyp]) < 0
             let self.bits = 32
-            let self.last_segment = l:hi
+            let self.last_segment = l:hi << 16
         endif
     elseif l:rectyp == 5
         " start linear address 32-bit
